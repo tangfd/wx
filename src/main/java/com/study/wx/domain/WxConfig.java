@@ -1,8 +1,10 @@
 package com.study.wx.domain;
 
+import com.study.wx.config.RedisService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import javax.validation.constraints.NotEmpty;
 
 /**
@@ -11,7 +13,9 @@ import javax.validation.constraints.NotEmpty;
 @Configuration
 @ConfigurationProperties(prefix = "wx.app")
 public class WxConfig {
-    public static String token;
+    @Resource
+    private RedisService redisService;
+
     @NotEmpty
     private String appId;
     @NotEmpty
@@ -26,6 +30,10 @@ public class WxConfig {
     private String deleteMenuUrl;
     @NotEmpty
     private String baseUrl;
+
+    public String getToken() {
+        return (String) redisService.get(WxConstants.TOKEN_KEY);
+    }
 
     public String getDeleteMenuUrl() {
         return baseUrl + deleteMenuUrl;

@@ -11,7 +11,7 @@
 <div style="margin-top: 50px;"></div>
 <div class="container">
     <div class="row clearfix">
-        <div class="col-md-12 column">
+        <div class="col-md-8 column">
             <div class="list-group">
                 <a href="getAccessToken" class="list-group-item active">1. 获取access_token</a>
                 <a href="refreshAccessToken" class="list-group-item">2. 刷新access_token</a>
@@ -32,6 +32,11 @@
                 <a href="getMenu" class="list-group-item active">4. 自定义菜单查询接口</a>
                 <a href="deleteMenu" class="list-group-item">5. 自定义菜单删除接口</a>
             </div>
+        </div>
+        <div class="col-md-4 column" style="overflow-x: auto;">
+            <h2 class="text-success">
+                ${message!}
+            </h2>
         </div>
     </div>
 </div>
