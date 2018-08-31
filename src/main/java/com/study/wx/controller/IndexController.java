@@ -1,6 +1,9 @@
 package com.study.wx.controller;
 
+import com.study.wx.domain.EventMessage;
+import com.study.wx.domain.WxConstants;
 import com.study.wx.utils.SignUtil;
+import com.tfd.base.utils.XmlJsonUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,9 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 
 /**
  * @author TangFD@HF 2018/8/27
@@ -34,7 +36,10 @@ public class IndexController {
     }
 
     @PostMapping("/")
-    public void receive(String signature, String timestamp, String openid, String nonce, HttpServletRequest request) {
+    public void receive(String signature, String timestamp, String openid, String nonce,
+                        HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         LOG.info("---receive-----signature : " + signature);
         LOG.info("---receive-----timestamp : " + timestamp);
         LOG.info("---receive-----openid : " + openid);
@@ -52,11 +57,52 @@ public class IndexController {
                 content.append(line);
             }
 
-            LOG.info(content.toString());
+            LOG.info(content);
+            EventMessage message = XmlJsonUtils.xml2Object(content.toString(), EventMessage.class);
+            LOG.info(message);
+            String msgType = message.getMsgType();
+            if (WxConstants.MSG_TYPE_EVENT.equals(msgType)) {
+                String event = message.getEvent();
+                switch (event) {
+                    case WxConstants.MSG_EVENT_CLICK:
+                        sendTextMessage(response, message, "你点击了按钮，哈哈哈哈哈");
+                        break;
+                    case WxConstants.MSG_EVENT_VIEW:
+                        sendTextMessage(response, message, "你跳转了链接[" + message.getEventKey() + "]，哈哈哈哈哈");
+                        break;
+                    case WxConstants.MSG_EVENT_SCANCODE_PUSH:
+                        sendTextMessage(response, message, "你跳转了链接[" + message.getEventKey() + "]，哈哈哈哈哈");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             IOUtils.closeQuietly(reader);
+        }
+    }
+
+    private void sendTextMessage(HttpServletResponse response, EventMessage message, String content) {
+        EventMessage clickMessage = new EventMessage();
+        clickMessage.setToUserName(message.getFromUserName());
+        clickMessage.setFromUserName(message.getToUserName());
+        clickMessage.setCreateTime(System.currentTimeMillis());
+        clickMessage.setMsgType(WxConstants.MSG_TYPE_TEXT);
+        clickMessage.setContent(content);
+        PrintWriter writer = null;
+        try {
+            writer = response.getWriter();
+            String xml = XmlJsonUtils.object2Xml(clickMessage, "xml");
+            LOG.info("===send xml===" + xml);
+            writer.write(xml);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(writer);
         }
     }
 }

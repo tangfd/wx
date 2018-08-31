@@ -15,28 +15,74 @@
             <div class="list-group">
                 <a href="getAccessToken" class="list-group-item active">1. 获取access_token</a>
                 <a href="refreshAccessToken" class="list-group-item">2. 刷新access_token</a>
-                <div class="list-group-item">
-                    <form action="createMenu">
-                        <div><input type="submit" value="3. 自定义菜单" class="btn btn-default"/></div>
+                <form action="createMenu">
+                    <input type="submit" value="3. 自定义菜单" class="btn btn-default btn-primary"/>
+                    <br>
                         <textarea name="content" cols="90" rows="10">{
-                            "button":[
-     {
-          "type":"view",
-          "name":"视频解析",
-          "url":"http://45.40.202.204/vip"
-      }]
- }</textarea>
-                    </form>
+     "button":[
+		{
+          "name":"测试按钮",
+          "sub_button": [
+                {
+                    "type": "click",
+                    "name": "点击按钮",
+                    "key": "0000000000000001"
+                },
+                {
+					"type":"view",
+					"name":"视频解析",
+					"url":"http://cloud.cneln.net/feipeng-ps/vip/"
+				},
+				{
+                    "type": "scancode_waitmsg",
+                    "name": "扫码带提示",
+                    "key": "rselfmenu_0_0"
+                },
+				{
+                    "type": "scancode_push",
+                    "name": "扫码推事件",
+                    "key": "rselfmenu_0_1"
+                },
+				{
+					"type": "location_select",
+					"name": "发送位置",
+					"key": "rselfmenu_2_0"
+				}
+            ]
+		},
+		{
+          "name":"测试图片",
+          "sub_button": [
+				{
+                    "type": "pic_sysphoto",
+                    "name": "系统拍照发图",
+                    "key": "rselfmenu_1_0"
+                 },
+                {
+                    "type": "pic_photo_or_album",
+                    "name": "拍照或者相册发图",
+                    "key": "rselfmenu_1_1"
+                },
+                {
+                    "type": "pic_weixin",
+                    "name": "微信相册发图",
+                    "key": "rselfmenu_1_2"
+                }
+			]
+		}
 
-                </div>
+	]
+}</textarea>
+                </form>
                 <a href="getMenu" class="list-group-item active">4. 自定义菜单查询接口</a>
                 <a href="deleteMenu" class="list-group-item">5. 自定义菜单删除接口</a>
+                <a href="getUserList" class="list-group-item active">6. 获取用户列表</a>
             </div>
         </div>
-        <div class="col-md-4 column" style="overflow-x: auto;">
-            <h2 class="text-success">
-                ${message!}
-            </h2>
+        <div class="col-md-4 column">
+            <h5 class="text-success">
+            ${message!}
+            </h5>
         </div>
     </div>
 </div>

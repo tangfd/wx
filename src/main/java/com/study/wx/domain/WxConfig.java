@@ -30,6 +30,26 @@ public class WxConfig {
     private String deleteMenuUrl;
     @NotEmpty
     private String baseUrl;
+    @NotEmpty
+    private String userListUrl;
+    @NotEmpty
+    private String userUrl;
+
+    public String getUserListUrl() {
+        return baseUrl + userListUrl;
+    }
+
+    public void setUserListUrl(String userListUrl) {
+        this.userListUrl = userListUrl;
+    }
+
+    public String getUserUrl() {
+        return baseUrl + userUrl;
+    }
+
+    public void setUserUrl(String userUrl) {
+        this.userUrl = userUrl;
+    }
 
     public String getToken() {
         return (String) redisService.get(WxConstants.TOKEN_KEY);

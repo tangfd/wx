@@ -1,10 +1,14 @@
 package com.study.wx.controller;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.study.wx.config.RedisService;
 import com.study.wx.domain.AccessToken;
 import com.study.wx.domain.WxConfig;
 import com.study.wx.domain.WxConstants;
 import com.tfd.base.utils.HttpUtils;
+import com.tfd.base.utils.XmlJsonUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -60,7 +64,7 @@ public class WxTestController {
     public String createMenu(@RequestParam String content, Model model) {
         try {
             String menuUrl = config.getMenuUrl();
-            String result = HttpUtils.doPostAsString(menuUrl.replace("ACCESS_TOKEN", config.getToken()), content);
+            String result = HttpUtils.doPostByBodyAsString(menuUrl.replace("ACCESS_TOKEN", config.getToken()), content);
             String message = "URL: ----> " + menuUrl + "<br><br><br>" + "result: ----> " + result;
             model.addAttribute("message", message);
             return "tools";
@@ -98,6 +102,38 @@ public class WxTestController {
             LOG.error(e);
         }
 
+        return null;
+    }
+
+    @RequestMapping("/getUserList")
+    public String getUserList(Model model) {
+        try {
+            String userListUrl = config.getUserListUrl();
+            String result = HttpUtils.doGetAsString(userListUrl.replace("ACCESS_TOKEN", config.getToken()).replace("NEXT_OPENID", ""));
+            String message = "URL: ----> " + userListUrl + "<br><br><br>" + "result: ----> ";
+            JsonObject jsonObject = XmlJsonUtils.json2Object(result);
+            JsonElement data = jsonObject.get("data");
+            JsonArray jsonArray = ((JsonObject) data).get("openid").getAsJsonArray();
+            for (JsonElement element : jsonArray) {
+                message += getUser(element.getAsString());
+            }
+
+            model.addAttribute("message", message);
+            return "tools";
+        } catch (IOException e) {
+            LOG.error(e);
+        }
+
+        return null;
+    }
+
+    private String getUser(String openId) {
+        String userUrl = config.getUserUrl();
+        try {
+            return HttpUtils.doGetAsString(userUrl.replace("ACCESS_TOKEN", config.getToken()).replace("OPENID", openId));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
